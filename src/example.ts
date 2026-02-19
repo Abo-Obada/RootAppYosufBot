@@ -11,8 +11,6 @@ import {
   CommunityEvent,
   CommunityMemberBanEvent,
   CommunityMemberBanCreatedEvent,
-  Channel,
-  ChannelListRequest,
   ChannelGuid,
   ChannelMessageDeleteRequest,
   UserGuid,
@@ -34,14 +32,11 @@ export function initializeExample(): void {
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onBadWordRemoval);
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onPreventLinks);
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onHelp);
-  rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onDeleteMessage);
-
 }    
 
-//ban the fuck out of users
+//ban the fuck ass of users
 async function  onBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
-  
   const banArr = ["/ban ", "/حظر ","/توكل "];
   if(evt.messageType === MessageType.System) return;
   const ban:string | undefined = banArr.find(n=> evt.messageContent.startsWith(n.trim()));
@@ -145,22 +140,14 @@ async function  onKickCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 }
 //determine who joined
 async function onJoinMember(evt: CommunityJoinedEvent): Promise<void>{
-  //get who has been joined to the server
   const user:string = (await rootServer.community.communityMembers.get(evt)).nickname;
   const customMessage:string = `نورت السيرفر يا ${user} `;
-
-  const channelId:ChannelGuid | undefined = await getWelcomeChannel("Welcome","WelcomeGroup");
-  if(channelId){
-  const createMessageRequest:ChannelMessageCreateRequest = {channelId: channelId, content:customMessage }
-  rootServer.community.channelMessages.create(createMessageRequest);
-  
-  }
- 
+  const channelId:string =  "002cf492-4958-8304-bc09-1dd5d55617a5";
+  rootServer.community.channelMessages.create({channelId: channelId as ChannelGuid, content:customMessage});
 }
 //clean input from curse words
 async function onBadWordRemoval(evt: ChannelMessageCreatedEvent) : Promise<void> {
   
-  const username = (await rootServer.community.communityMembers.get(evt));
   const message:string = evt.messageContent;
   const normalized = message.toLowerCase();
 
@@ -169,32 +156,15 @@ const clean = normalized
   .replace(/[^a-z\s]/g, "");
 
 const isBad = data.some(item => new RegExp(`\\b(${item.match.toLocaleLowerCase()})\\b`).test(clean));
-const channelId:ChannelGuid | undefined = await getWelcomeChannel("Welcome","WelcomeGroup");
-if(channelId ){
+
  if(isBad){
-   const messageRequestDelete:ChannelMessageDeleteRequest = {channelId: channelId, id: evt.id};
-  await rootServer.community.channelMessages.delete(messageRequestDelete);
-  const messageRequestCreate:ChannelMessageCreateRequest = {channelId: channelId,content: "Watch your language, the diddy is watching 👀"} 
-  await rootServer.community.channelMessages.create(messageRequestCreate);
- }
+  try {
+  await rootServer.community.channelMessages.delete({channelId: evt.channelId, id: evt.id});
+  await rootServer.community.channelMessages.create({channelId: evt.channelId,content: "Watch your language, the diddy is watching 👀"});
+  } catch (RootApiException) {
+    console.log(RootApiException);
+  }
 }
-    
-
-}
-//welcome users on welcome channel
-async function getWelcomeChannel(groupChannelName:string, channelName:string)  {
-  const getChannelGroups = await rootServer.community.channelGroups.list();
-
-  const channelGroup = getChannelGroups.find(n=>n.name === groupChannelName);
-    if(channelGroup && channelGroup.id){
-      const channelListRequestId:ChannelListRequest = {channelGroupId: channelGroup.id};
-      const channelsRequest:Channel[] = (await rootServer.community.channels.list(channelListRequestId));
-      const channels = channelsRequest.find(r=>r.name === channelName);
-      if(channels && channels.id){
-       return channels.id;
-      }
-    }
-    return undefined;
 }
 
 async function onPreventLinks(evt: ChannelMessageCreatedEvent): Promise<void> {
@@ -237,18 +207,4 @@ async function onHelp(evt: ChannelMessageCreatedEvent):Promise<void> {
     /توقيف
     /مؤقت
     `});
-
-}
-
-async function  onDeleteMessage(evt: ChannelMessageCreatedEvent) {
-  if(!evt.messageContent.startsWith("/deletemessage ".trim())) return;
-  if(evt.messageType === MessageType.System) return;
-
- try {
-  const count = evt.messageContent.split(" ")[1];
-  
- 
- } catch (error) {
-  console.log(error);
- }
 }
