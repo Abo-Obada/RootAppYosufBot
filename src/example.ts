@@ -16,6 +16,7 @@ import {
   UserGuid,
   RootApiException,
   ErrorCodeType,
+  ChannelGroupGuid,
 
 } from "@rootsdk/server-bot";
 
@@ -32,6 +33,7 @@ export function initializeExample(): void {
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onBadWordRemoval);
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onPreventLinks);
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onHelp);
+ // rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated,onCloseServer);
 }    
 
 //ban the fuck ass of users
@@ -152,10 +154,10 @@ async function onBadWordRemoval(evt: ChannelMessageCreatedEvent) : Promise<void>
   const normalized = message.toLowerCase();
 
 const clean = normalized
-  .toLowerCase()
-  .replace(/[^a-z\s]/g, "");
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "");
 
-const isBad = data.some(item => new RegExp(`\\b(${item.match.toLocaleLowerCase()})\\b`).test(clean));
+  const isBad = data.some(item => new RegExp(`\\b(${item.match.toLocaleLowerCase()})\\b`).test(clean));
 
  if(isBad){
   try {
@@ -208,3 +210,18 @@ async function onHelp(evt: ChannelMessageCreatedEvent):Promise<void> {
     /مؤقت
     `});
 }
+
+//  async function onCloseServer(evt: ChannelMessageCreatedEvent):Promise<void> {
+//    const prefix:string = "/close";
+//    if(evt.messageType === MessageType.System) return;
+
+//    try {
+//       const everyoneRole =  (await rootServer.community.communityRoles.list()).find(n=>n.name ==="EVERYONE");
+//       if(everyoneRole){
+//           const channelGroupId = "002d16e3-80e4-8105-8d60-013a50a362a1" as ChannelGroupGuid;
+//         await rootServer.community.channelGroups.emit("channelGroup.edited",{channelGroupPermission:{}})
+//       }
+//     }catch(error){
+//       console.log(error);
+//     }
+//  }
