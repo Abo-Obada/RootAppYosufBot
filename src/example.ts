@@ -46,7 +46,7 @@ async function  onBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
   const isAuth:boolean = await canBan(evt.userId);
   if(!isAuth){
-   await rootServer.community.channelMessages.create({channelId: evt.channelId, content: `ليس لديك صلاحية الحظر المستخدمين يا منيوك `});
+   await rootServer.community.channelMessages.create({channelId: evt.channelId, content: `ليس لديك صلاحية الحظر المستخدمين   `});
    return;
   }
 
@@ -79,7 +79,7 @@ async function  onTimeout(evt: ChannelMessageCreatedEvent): Promise<void> {
 
   const isAuth:boolean = await canBan(evt.userId);
   if(!isAuth){
-   await rootServer.community.channelMessages.create({channelId: evt.channelId, content: `شوف يا كس, بس المعلم يلي بيعطي تايم أوت `});
+   await rootServer.community.channelMessages.create({channelId: evt.channelId, content: `لا تملك صلاحيات كافية `});
    return;
   }
 
@@ -114,7 +114,7 @@ async function  onKickCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   //if user has no perm, it will won't ban.
   const isAuth:boolean = await canKick(evt.userId);
   if(!isAuth){
-   await rootServer.community.channelMessages.create({channelId: evt.channelId, content: `ليس لديك صلاحية للطرد المستخدمين يا منيوك 
+   await rootServer.community.channelMessages.create({channelId: evt.channelId, content: `ليس لديك صلاحية للطرد المستخدمين 
     إذ بدك فيك تنيك حالك فعادي `});
    return;
   }
